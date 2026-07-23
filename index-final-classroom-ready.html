@@ -1,0 +1,3087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>My Interview Profile Quiz</title>
+
+  <meta
+    name="description"
+    content="A classroom-ready university interview profile quiz for M.6 students."
+  >
+
+  <link
+    rel="preload"
+    as="image"
+    href="assets/girl-stage-0.png"
+  >
+
+  <style>
+    :root {
+      --primary: #613992;
+      --primary-dark: #3b1e5d;
+      --primary-light: #eee8fa;
+      --background: #f5f3fa;
+      --card: #ffffff;
+      --text: #222222;
+      --muted: #666666;
+      --border: #ded9e8;
+      --danger: #9d2020;
+      --danger-light: #ffe5e5;
+      --active-gold: #f1c84c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background: var(--background);
+    }
+
+    button,
+    textarea,
+    input {
+      font-family: inherit;
+    }
+
+    .quiz-container {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 30px;
+      max-width: 1200px;
+      margin: auto;
+      align-items: start;
+    }
+
+    .quiz-panel,
+    .progress-panel {
+      padding: 28px;
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .progress-panel {
+      position: sticky;
+      top: 20px;
+    }
+
+    .app-header {
+      margin-bottom: 22px;
+    }
+
+    .app-header h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+
+    .app-subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    /* Student information start screen */
+
+    body.student-start .quiz-container {
+      display: block;
+      max-width: 760px;
+    }
+
+    body.student-start .progress-panel,
+    body.student-start .navigation,
+    body.student-start .stage-text,
+    body.student-start .error-message {
+      display: none !important;
+    }
+
+    .student-start-card {
+      padding: 24px;
+      background: #faf9fd;
+      border: 1px solid var(--border);
+      border-top: 5px solid var(--primary);
+      border-radius: 14px;
+    }
+
+    .student-start-card h2 {
+      margin: 0 0 8px;
+      color: var(--primary-dark);
+    }
+
+    .student-start-card > p {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .student-form-error {
+      display: none;
+      margin-bottom: 18px;
+      padding: 12px;
+      color: var(--danger);
+      background: var(--danger-light);
+      border-radius: 8px;
+    }
+
+    .student-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .student-field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .student-field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .student-field input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #bbbbbb;
+      border-radius: 8px;
+    }
+
+    .student-field input:focus {
+      border-color: var(--primary);
+      outline: 3px solid var(--primary-light);
+    }
+
+    .start-quiz-button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 13px 24px;
+      color: white;
+      background: var(--primary);
+      border: none;
+      border-radius: 9px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .start-quiz-button:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Saved-profile choice screen */
+
+    body.resume-choice .quiz-container {
+      display: block;
+      max-width: 760px;
+    }
+
+    body.resume-choice .progress-panel,
+    body.resume-choice .navigation,
+    body.resume-choice .stage-text,
+    body.resume-choice .error-message {
+      display: none !important;
+    }
+
+    .resume-card {
+      padding: 24px;
+      background: #faf9fd;
+      border: 1px solid var(--border);
+      border-top: 5px solid var(--primary);
+      border-radius: 14px;
+    }
+
+    .resume-card h2 {
+      margin: 0 0 8px;
+      color: var(--primary-dark);
+    }
+
+    .resume-card > p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .saved-profile-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+      padding: 18px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .saved-profile-item span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .saved-profile-item strong {
+      display: block;
+      color: var(--primary-dark);
+      overflow-wrap: anywhere;
+    }
+
+    .resume-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .resume-actions button {
+      padding: 13px 18px;
+      border: none;
+      border-radius: 9px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #continue-profile-button {
+      color: white;
+      background: var(--primary);
+    }
+
+    #continue-profile-button:hover {
+      background: var(--primary-dark);
+    }
+
+    #new-profile-button {
+      color: #8a1f1f;
+      background: #f2dede;
+    }
+
+    .stage-text {
+      margin: 0 0 18px;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .error-message {
+      display: none;
+      margin-bottom: 18px;
+      padding: 12px;
+      color: var(--danger);
+      background: var(--danger-light);
+      border-radius: 8px;
+    }
+
+    #quiz-content h2 {
+      margin-top: 0;
+      color: var(--primary-dark);
+    }
+
+    .question-card {
+      margin-bottom: 20px;
+      padding: 18px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .question-card label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 78px;
+      padding: 12px;
+      font-size: 16px;
+      line-height: 1.5;
+      border: 1px solid #bbbbbb;
+      border-radius: 8px;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+      outline: 3px solid var(--primary-light);
+    }
+
+    .example-button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .example-button:hover {
+      background: #ded1f5;
+    }
+
+    .example-box {
+      display: none;
+      margin-top: 10px;
+      padding: 12px;
+      background: #f7f3fd;
+      border-left: 4px solid var(--primary);
+      border-radius: 4px;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .navigation button {
+      min-width: 110px;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .navigation button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    #back-button {
+      background: #dddddd;
+    }
+
+    #next-button {
+      color: white;
+      background: var(--primary);
+    }
+
+    #next-button:hover {
+      background: var(--primary-dark);
+    }
+
+    .progress-panel h2 {
+      margin: 0 0 6px;
+      text-align: center;
+      color: var(--primary-dark);
+    }
+
+    .progress-status {
+      margin: 0 0 15px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .student-image-wrapper {
+      display: flex;
+      justify-content: center;
+      min-height: 260px;
+      margin-bottom: 18px;
+    }
+
+    #student-image {
+      width: 100%;
+      max-height: 340px;
+      object-fit: contain;
+    }
+
+    /* Pyramid */
+
+    .pyramid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      margin: 12px auto 0;
+    }
+
+    .pyramid-layer {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 58px;
+      margin-top: -2px;
+      padding: 9px 24px;
+      text-align: center;
+      color: white;
+      clip-path: polygon(
+        8% 0,
+        92% 0,
+        100% 100%,
+        0 100%
+      );
+      transition:
+        opacity 0.35s ease,
+        filter 0.35s ease,
+        transform 0.3s ease;
+    }
+
+    .pyramid-layer.goal {
+      width: 58%;
+      background: #3b1e5d;
+    }
+
+    .pyramid-layer.achievements {
+      width: 68%;
+      background: #47266e;
+    }
+
+    .pyramid-layer.experiences {
+      width: 76%;
+      background: #542f80;
+    }
+
+    .pyramid-layer.strengths {
+      width: 84%;
+      background: #613992;
+    }
+
+    .pyramid-layer.interests {
+      width: 92%;
+      background: #6f44a4;
+    }
+
+    .pyramid-layer.improve {
+      width: 100%;
+      background: #7d50b6;
+    }
+
+    .pyramid-layer.locked {
+      opacity: 0.2;
+      filter: grayscale(1);
+    }
+
+    .pyramid-layer.completed {
+      opacity: 1;
+      filter: none;
+    }
+
+    .pyramid-layer.current {
+      opacity: 1;
+      filter: none;
+      transform: scale(1.025);
+      outline: 4px solid var(--active-gold);
+      outline-offset: 2px;
+      z-index: 2;
+    }
+
+    .layer-title {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.4px;
+    }
+
+    .layer-prompt {
+      display: block;
+      margin-top: 3px;
+      font-size: 10px;
+      line-height: 1.25;
+    }
+
+    .pyramid-note {
+      margin: 14px 0 0;
+      padding: 10px;
+      text-align: center;
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    /* Completed profile */
+
+    body.profile-complete .quiz-container {
+      display: block;
+      max-width: 1000px;
+    }
+
+    body.profile-complete .progress-panel {
+      display: none;
+    }
+
+    .profile-cover {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 28px;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 28px;
+      color: white;
+      background: linear-gradient(
+        135deg,
+        #3b1e5d,
+        #613992
+      );
+      border-radius: 18px;
+    }
+
+    .profile-cover h2 {
+      margin: 6px 0 12px;
+      color: white !important;
+      font-size: 34px;
+    }
+
+    .profile-cover p {
+      line-height: 1.5;
+    }
+
+    .cover-label {
+      margin: 0;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .goal-highlight {
+      margin-top: 22px;
+      padding: 15px;
+      color: var(--primary-dark);
+      background: white;
+      border-radius: 12px;
+    }
+
+    .goal-highlight span {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .goal-highlight strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .student-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .student-detail {
+      padding: 11px;
+      color: var(--primary-dark);
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 10px;
+    }
+
+    .student-detail.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .student-detail span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .student-detail strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    .cover-visual {
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 15px;
+    }
+
+    .final-student-image {
+      display: block;
+      width: 100%;
+      max-height: 220px;
+      margin: 0 auto 12px;
+      object-fit: contain;
+    }
+
+    .final-pyramid .pyramid-layer {
+      min-height: 42px;
+      padding: 6px 18px;
+    }
+
+    .final-pyramid .layer-title {
+      font-size: 11px;
+    }
+
+    .final-pyramid .layer-prompt {
+      font-size: 8px;
+    }
+
+    .profile-introduction {
+      margin: 0 0 22px;
+      padding: 16px;
+      text-align: center;
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      border-radius: 10px;
+    }
+
+    .profile-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      text-align: left;
+    }
+
+    .profile-section {
+      position: relative;
+      padding: 20px;
+      background: #faf9fd;
+      border: 1px solid var(--border);
+      border-top: 5px solid var(--primary);
+      border-radius: 14px;
+      break-inside: avoid;
+    }
+
+    .profile-section:first-child {
+      grid-column: 1 / -1;
+    }
+
+    .profile-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .profile-section-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+      color: white;
+      background: var(--primary);
+      border-radius: 50%;
+      font-weight: bold;
+    }
+
+    .profile-section h3 {
+      margin: 0;
+      color: var(--primary-dark);
+    }
+
+    .profile-item {
+      margin-top: 14px;
+    }
+
+    .profile-question {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #4c4c4c;
+    }
+
+    .profile-answer {
+      margin: 0;
+      padding: 11px;
+      line-height: 1.45;
+      background: white;
+      border-left: 4px solid var(--primary);
+      border-radius: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .completion-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .completion-actions button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    #edit-profile-button {
+      background: #dddddd;
+    }
+
+    #print-profile-button {
+      color: white;
+      background: var(--primary);
+    }
+
+    #restart-button {
+      color: #8a1f1f;
+      background: #f2dede;
+    }
+
+    @media (max-width: 850px) {
+      body {
+        padding: 15px;
+      }
+
+      .quiz-container {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-panel {
+        position: static;
+        order: -1;
+      }
+
+      .student-image-wrapper {
+        min-height: 180px;
+      }
+
+      #student-image {
+        max-height: 280px;
+      }
+
+      .profile-cover {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-section:first-child {
+        grid-column: auto;
+      }
+
+      .student-fields,
+      .student-details,
+      .saved-profile-summary,
+      .resume-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .student-field.full-width,
+      .student-detail.full-width {
+        grid-column: auto;
+      }
+    }
+
+    /* Printing / PDF */
+
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body {
+        padding: 0;
+        background: white;
+        font-size: 11pt;
+      }
+
+      .quiz-container {
+        display: block;
+        max-width: none;
+      }
+
+      .quiz-panel {
+        padding: 0;
+        box-shadow: none;
+      }
+
+      .app-header,
+      .progress-panel,
+      .navigation,
+      .completion-actions,
+      .stage-text,
+      .error-message {
+        display: none !important;
+      }
+
+      .profile-cover {
+        grid-template-columns: 1fr 320px;
+        gap: 18px;
+        margin-bottom: 18px;
+        padding: 20px;
+        border-radius: 10px;
+        break-inside: avoid;
+      }
+
+      .profile-cover h2 {
+        font-size: 25px;
+      }
+
+      .final-student-image {
+        max-height: 160px;
+      }
+
+      .final-pyramid .pyramid-layer {
+        min-height: 31px;
+        padding: 4px 14px;
+      }
+
+      .final-pyramid .layer-title {
+        font-size: 8px;
+      }
+
+      .final-pyramid .layer-prompt {
+        display: none;
+      }
+
+      .profile-introduction {
+        margin-bottom: 14px;
+        padding: 10px;
+      }
+
+      .profile-summary {
+        display: block;
+      }
+
+      .profile-section {
+        margin-bottom: 12px;
+        padding: 14px;
+        border-radius: 8px;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .profile-section-header {
+        margin-bottom: 9px;
+      }
+
+      .profile-section-number {
+        width: 25px;
+        height: 25px;
+        flex-basis: 25px;
+        font-size: 10px;
+      }
+
+      .profile-section h3 {
+        font-size: 15px;
+      }
+
+      .profile-item {
+        margin-top: 8px;
+      }
+
+      .profile-question {
+        margin-bottom: 3px;
+        font-size: 10px;
+      }
+
+      .profile-answer {
+        padding: 7px;
+        font-size: 10px;
+      }
+    }
+
+    /* Final classroom hardening and deployment-ready additions */
+
+    button,
+    input,
+    textarea {
+      min-height: 44px;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    [tabindex="-1"]:focus-visible {
+      outline: 3px solid var(--active-gold);
+      outline-offset: 3px;
+    }
+
+    .storage-notice,
+    .shared-device-warning {
+      margin: 0 0 18px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      line-height: 1.45;
+    }
+
+    .storage-notice {
+      color: #4b3a12;
+      background: #fff5cf;
+      border: 1px solid #ead68a;
+    }
+
+    .shared-device-warning {
+      color: #5f3312;
+      background: #fff1e5;
+      border-left: 5px solid #d77b2b;
+    }
+
+    .identity-check {
+      margin: 0 0 18px;
+      padding: 16px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .identity-check label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .identity-check input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #bbbbbb;
+      border-radius: 8px;
+    }
+
+    .identity-help {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .identity-error {
+      display: none;
+      margin: 10px 0 0;
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    .char-count {
+      display: block;
+      margin-top: 6px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    textarea[aria-invalid="true"],
+    input[aria-invalid="true"] {
+      border-color: var(--danger);
+      outline: 2px solid var(--danger-light);
+    }
+
+    .image-fallback,
+    .final-image-fallback {
+      width: 100%;
+      padding: 18px;
+      text-align: center;
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      border: 1px dashed var(--primary);
+      border-radius: 12px;
+      line-height: 1.45;
+    }
+
+    .student-image-wrapper {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .profile-print-meta {
+      margin-top: 14px;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .profile-footer {
+      margin-top: 28px;
+      padding-top: 12px;
+      text-align: center;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .profile-section.section-color-0 {
+      border-top-color: #3b1e5d;
+    }
+
+    .profile-section.section-color-0 .profile-section-number {
+      background: #3b1e5d;
+    }
+
+    .profile-section.section-color-1 {
+      border-top-color: #47266e;
+    }
+
+    .profile-section.section-color-1 .profile-section-number {
+      background: #47266e;
+    }
+
+    .profile-section.section-color-2 {
+      border-top-color: #542f80;
+    }
+
+    .profile-section.section-color-2 .profile-section-number {
+      background: #542f80;
+    }
+
+    .profile-section.section-color-3 {
+      border-top-color: #613992;
+    }
+
+    .profile-section.section-color-3 .profile-section-number {
+      background: #613992;
+    }
+
+    .profile-section.section-color-4 {
+      border-top-color: #6f44a4;
+    }
+
+    .profile-section.section-color-4 .profile-section-number {
+      background: #6f44a4;
+    }
+
+    .profile-section.section-color-5 {
+      border-top-color: #7d50b6;
+    }
+
+    .profile-section.section-color-5 .profile-section-number {
+      background: #7d50b6;
+    }
+
+    #restart-quiz-button {
+      color: #4c3b10;
+      background: #fff0b8;
+    }
+
+    #finish-clear-button {
+      color: white;
+      background: #8a1f1f;
+    }
+
+    #finish-clear-button:hover {
+      background: #6f1717;
+    }
+
+    .cleared-card {
+      padding: 30px;
+      text-align: center;
+      background: #faf9fd;
+      border: 1px solid var(--border);
+      border-top: 5px solid var(--primary);
+      border-radius: 14px;
+    }
+
+    .cleared-card h2 {
+      margin-top: 0;
+      color: var(--primary-dark);
+    }
+
+    .cleared-card p {
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .cleared-card button {
+      margin-top: 12px;
+      padding: 13px 22px;
+      color: white;
+      background: var(--primary);
+      border: none;
+      border-radius: 9px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Compact progress above the quiz on phones and iPad portrait */
+    @media (max-width: 850px) {
+      .progress-panel {
+        order: 1;
+        position: static;
+        display: grid;
+        grid-template-columns: 150px minmax(0, 1fr);
+        grid-template-areas:
+          "progress-title progress-title"
+          "progress-status progress-status"
+          "progress-image progress-pyramid";
+        gap: 10px 16px;
+        align-items: center;
+        padding: 18px 22px;
+      }
+
+      .quiz-panel {
+        order: 2;
+        padding: 22px;
+      }
+
+      .progress-panel h2 {
+        grid-area: progress-title;
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .progress-status {
+        grid-area: progress-status;
+        margin: 0 0 2px;
+      }
+
+      .student-image-wrapper {
+        grid-area: progress-image;
+        min-height: 0;
+        height: 190px;
+        margin: 0;
+      }
+
+      #student-image {
+        max-height: 190px;
+      }
+
+      #pyramid-container {
+        grid-area: progress-pyramid;
+        min-width: 0;
+      }
+
+      .pyramid {
+        margin: 0;
+      }
+
+      .pyramid-layer {
+        min-height: 35px;
+        padding: 5px 12px;
+      }
+
+      .layer-title {
+        font-size: 11px;
+      }
+
+      .layer-prompt {
+        font-size: 8px;
+      }
+
+      .pyramid-note {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .quiz-panel,
+      .progress-panel {
+        border-radius: 13px;
+      }
+
+      .quiz-panel {
+        padding: 17px;
+      }
+
+      .progress-panel {
+        grid-template-columns: 105px minmax(0, 1fr);
+        gap: 8px 10px;
+        padding: 14px;
+      }
+
+      .progress-panel h2 {
+        font-size: 18px;
+      }
+
+      .progress-status {
+        font-size: 12px;
+      }
+
+      .app-header h1 {
+        font-size: 25px;
+      }
+
+      .question-card {
+        padding: 14px;
+      }
+
+      textarea {
+        min-height: 105px;
+      }
+
+      .navigation,
+      .completion-actions {
+        flex-direction: column;
+      }
+
+      .navigation button,
+      .completion-actions button,
+      .resume-actions button {
+        width: 100%;
+      }
+
+      .student-image-wrapper {
+        height: 138px;
+      }
+
+      #student-image {
+        max-height: 138px;
+      }
+
+      .pyramid-layer {
+        min-height: 31px;
+        padding: 4px 8px;
+      }
+
+      .layer-title {
+        font-size: 9px;
+      }
+
+      .layer-prompt {
+        display: none;
+      }
+
+      .profile-cover {
+        padding: 18px;
+      }
+
+      .profile-cover h2 {
+        font-size: 27px;
+      }
+    }
+
+    @media print {
+      .profile-cover {
+        page-break-after: always;
+      }
+
+      .profile-footer {
+        display: block !important;
+        margin-top: 18px;
+        page-break-inside: avoid;
+      }
+
+      .profile-section {
+        orphans: 3;
+        widows: 3;
+      }
+
+      .profile-print-meta {
+        font-size: 9px;
+      }
+
+      .image-fallback,
+      .final-image-fallback {
+        border: 1px solid #888888;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="quiz-container">
+
+    <main class="quiz-panel">
+
+      <header class="app-header">
+        <h1>My Interview Profile Quiz</h1>
+
+        <p class="app-subtitle">
+          Build your profile for your university interview.
+        </p>
+      </header>
+
+      <p id="stage-text" class="stage-text"></p>
+
+      <div
+        id="error-message"
+        class="error-message"
+        role="alert"
+        aria-live="assertive"
+      >
+        Please answer all three questions before continuing.
+      </div>
+
+      <section id="quiz-content"></section>
+
+      <div class="navigation">
+        <button id="back-button" type="button">
+          Back
+        </button>
+
+        <button id="next-button" type="button">
+          Next
+        </button>
+      </div>
+
+    </main>
+
+    <aside class="progress-panel">
+
+      <h2>Your Profile Progress</h2>
+
+      <p
+        id="progress-status"
+        class="progress-status"
+        aria-live="polite"
+      ></p>
+
+      <div class="student-image-wrapper">
+        <img
+          id="student-image"
+          src="assets/girl-stage-0.png"
+          alt="Student profile progress"
+        >
+
+        <div
+          id="student-image-fallback"
+          class="image-fallback"
+          role="status"
+          hidden
+        >
+          The progress image is unavailable. Your answers and pyramid are still saved.
+        </div>
+      </div>
+
+      <div id="pyramid-container"></div>
+
+      <p class="pyramid-note">
+        Complete each level from the top to the foundation.
+      </p>
+
+    </aside>
+
+  </div>
+
+  <script>
+    /*
+      Quiz order follows the pyramid from top to bottom:
+      1. Future Goal
+      2. Achievements
+      3. Experiences
+      4. Strengths
+      5. Interests
+      6. Area to Improve
+    */
+
+    const quizSections = [
+      {
+        title: "My Future Goal",
+        questions: [
+          {
+            question: "What do I want to study?",
+            example: "(Example: I want to study nursing.)"
+          },
+          {
+            question: "What job do I want?",
+            example: "(Example: I want to become a nurse.)"
+          },
+          {
+            question: "Why do I want this job?",
+            example: "(Example: I want to help sick people.)"
+          }
+        ]
+      },
+      {
+        title: "My Achievements",
+        questions: [
+          {
+            question: "What did I complete successfully?",
+            example: "(Example: I completed a difficult biology project.)"
+          },
+          {
+            question: "What result did I achieve?",
+            example: "(Example: I improved my biology grade.)"
+          },
+          {
+            question: "Why am I proud of it?",
+            example: "(Example: I worked hard and did not give up.)"
+          }
+        ]
+      },
+      {
+        title: "My Experiences",
+        questions: [
+          {
+            question: "What activity did I join?",
+            example: "(Example: I joined a school health activity.)"
+          },
+          {
+            question: "What did I do?",
+            example: "(Example: I helped prepare the equipment.)"
+          },
+          {
+            question: "What did I learn?",
+            example: "(Example: I learned how to work carefully with a team.)"
+          }
+        ]
+      },
+      {
+        title: "My Strengths",
+        questions: [
+          {
+            question: "What personal quality do I have?",
+            example: "(Example: I am patient.)"
+          },
+          {
+            question: "What can I do well?",
+            example: "(Example: I can listen carefully.)"
+          },
+          {
+            question: "What example shows this strength?",
+            example: "(Example: I help my classmates when they have a problem.)"
+          }
+        ]
+      },
+      {
+        title: "My Interests",
+        questions: [
+          {
+            question: "What subject do I enjoy?",
+            example: "(Example: I enjoy biology.)"
+          },
+          {
+            question: "What topic interests me?",
+            example: "(Example: I am interested in health.)"
+          },
+          {
+            question: "What activity do I enjoy?",
+            example: "(Example: I enjoy helping other people.)"
+          }
+        ]
+      },
+      {
+        title: "My Area to Improve",
+        questions: [
+          {
+            question: "What do I need to improve?",
+            example: "(Example: I need to speak with more confidence.)"
+          },
+          {
+            question: "When is this difficult for me?",
+            example: "(Example: I feel nervous when I speak in front of a group.)"
+          },
+          {
+            question: "What am I doing to improve?",
+            example: "(Example: I practice speaking with my friends.)"
+          }
+        ]
+      }
+    ];
+
+    const pyramidOrder = [
+      {
+        title: "MY FUTURE GOAL",
+        prompt: "What do I want to study or become?",
+        sectionIndex: 0,
+        className: "goal"
+      },
+      {
+        title: "MY ACHIEVEMENTS",
+        prompt: "What results show my progress?",
+        sectionIndex: 1,
+        className: "achievements"
+      },
+      {
+        title: "MY EXPERIENCES",
+        prompt: "What have I done and learned?",
+        sectionIndex: 2,
+        className: "experiences"
+      },
+      {
+        title: "MY STRENGTHS",
+        prompt: "What qualities will help me?",
+        sectionIndex: 3,
+        className: "strengths"
+      },
+      {
+        title: "MY INTERESTS",
+        prompt: "What subjects, topics and activities connect to my goal?",
+        sectionIndex: 4,
+        className: "interests"
+      },
+      {
+        title: "MY AREA TO IMPROVE",
+        prompt: "What must I improve, and what am I doing about it?",
+        sectionIndex: 5,
+        className: "improve"
+      }
+    ];
+
+    const STORAGE_KEY = "myInterviewProfileQuizStateV2";
+    const LEGACY_STORAGE_KEYS = [
+      "myInterviewProfileQuizStateV1"
+    ];
+    const STORAGE_VERSION = 2;
+    const MAX_ANSWER_LENGTH = 600;
+    const MAX_NAME_LENGTH = 100;
+    const MAX_SHORT_FIELD_LENGTH = 40;
+
+    let currentSection = 0;
+    let completedCount = 0;
+    let quizStarted = false;
+    let profileComplete = false;
+    let startupNotice = "";
+
+    const answers = quizSections.map(() => ["", "", ""]);
+
+    const studentInfo = {
+      fullName: "",
+      nickname: "",
+      className: "",
+      studentNumber: ""
+    };
+
+    const quizContent =
+      document.getElementById("quiz-content");
+
+    const stageText =
+      document.getElementById("stage-text");
+
+    const studentImage =
+      document.getElementById("student-image");
+
+    const studentImageFallback =
+      document.getElementById("student-image-fallback");
+
+    const pyramidContainer =
+      document.getElementById("pyramid-container");
+
+    const progressStatus =
+      document.getElementById("progress-status");
+
+    const backButton =
+      document.getElementById("back-button");
+
+    const nextButton =
+      document.getElementById("next-button");
+
+    const errorMessage =
+      document.getElementById("error-message");
+
+    function escapeHTML(value) {
+      const characters = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      };
+
+      return String(value).replace(
+        /[&<>"']/g,
+        character => characters[character]
+      );
+    }
+
+    function formatAnswer(value) {
+      return escapeHTML(value).replace(/\n/g, "<br>");
+    }
+
+    function sanitizeText(value, maxLength) {
+      if (typeof value !== "string") {
+        return "";
+      }
+
+      return value.slice(0, maxLength);
+    }
+
+    function clampNumber(value, minimum, maximum) {
+      const number = Number(value);
+
+      if (!Number.isFinite(number)) {
+        return minimum;
+      }
+
+      return Math.min(
+        Math.max(Math.trunc(number), minimum),
+        maximum
+      );
+    }
+
+    function maskStudentNumber(value) {
+      const cleanValue = String(value || "").trim();
+
+      if (cleanValue.length <= 2) {
+        return "••";
+      }
+
+      return `${"•".repeat(
+        Math.max(cleanValue.length - 2, 2)
+      )}${cleanValue.slice(-2)}`;
+    }
+
+    function formatDateTime(date) {
+      try {
+        return new Intl.DateTimeFormat(
+          "en-GB",
+          {
+            dateStyle: "medium",
+            timeStyle: "short"
+          }
+        ).format(date);
+      } catch (error) {
+        return date.toLocaleString();
+      }
+    }
+
+    function showStartupNotice() {
+      if (!startupNotice) {
+        return "";
+      }
+
+      return `
+        <div
+          class="storage-notice"
+          role="status"
+        >
+          ${escapeHTML(startupNotice)}
+        </div>
+      `;
+    }
+
+    function getStorageKeys() {
+      return [STORAGE_KEY, ...LEGACY_STORAGE_KEYS];
+    }
+
+    function clearSavedState() {
+      getStorageKeys().forEach(key => {
+        try {
+          localStorage.removeItem(key);
+        } catch (error) {
+          console.warn(
+            "Saved progress could not be cleared.",
+            error
+          );
+        }
+      });
+    }
+
+    function saveState() {
+      const safeAnswers = answers.map(sectionAnswers =>
+        sectionAnswers.map(answer =>
+          sanitizeText(answer, MAX_ANSWER_LENGTH)
+        )
+      );
+
+      const state = {
+        version: STORAGE_VERSION,
+        quizStarted,
+        profileComplete,
+        currentSection,
+        completedCount,
+        studentInfo: {
+          fullName: sanitizeText(
+            studentInfo.fullName,
+            MAX_NAME_LENGTH
+          ),
+          nickname: sanitizeText(
+            studentInfo.nickname,
+            MAX_SHORT_FIELD_LENGTH
+          ),
+          className: sanitizeText(
+            studentInfo.className,
+            MAX_SHORT_FIELD_LENGTH
+          ),
+          studentNumber: sanitizeText(
+            studentInfo.studentNumber,
+            MAX_SHORT_FIELD_LENGTH
+          )
+        },
+        answers: safeAnswers
+      };
+
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(state)
+        );
+
+        LEGACY_STORAGE_KEYS.forEach(key => {
+          localStorage.removeItem(key);
+        });
+      } catch (error) {
+        startupNotice =
+          "Automatic saving is unavailable in this browser. Keep this page open until you finish.";
+
+        console.warn(
+          "Progress could not be saved.",
+          error
+        );
+      }
+    }
+
+    function findSavedState() {
+      for (const key of getStorageKeys()) {
+        try {
+          const value = localStorage.getItem(key);
+
+          if (value) {
+            return { key, value };
+          }
+        } catch (error) {
+          startupNotice =
+            "Automatic saving is unavailable in this browser. Keep this page open until you finish.";
+
+          console.warn(
+            "Saved progress could not be accessed.",
+            error
+          );
+
+          return null;
+        }
+      }
+
+      return null;
+    }
+
+    function loadSavedState() {
+      const stored = findSavedState();
+
+      if (!stored) {
+        return false;
+      }
+
+      let savedState;
+
+      try {
+        savedState = JSON.parse(stored.value);
+      } catch (error) {
+        clearSavedState();
+
+        startupNotice =
+          "Damaged saved progress was found and safely cleared. Start a new profile.";
+
+        return false;
+      }
+
+      const supportedVersion =
+        savedState &&
+        [1, STORAGE_VERSION].includes(
+          Number(savedState.version)
+        );
+
+      if (
+        !supportedVersion ||
+        !Array.isArray(savedState.answers)
+      ) {
+        clearSavedState();
+
+        startupNotice =
+          "Outdated or incomplete saved progress was safely cleared. Start a new profile.";
+
+        return false;
+      }
+
+      const savedStudentInfo =
+        savedState.studentInfo || {};
+
+      studentInfo.fullName = sanitizeText(
+        savedStudentInfo.fullName,
+        MAX_NAME_LENGTH
+      );
+
+      studentInfo.nickname = sanitizeText(
+        savedStudentInfo.nickname,
+        MAX_SHORT_FIELD_LENGTH
+      );
+
+      studentInfo.className = sanitizeText(
+        savedStudentInfo.className,
+        MAX_SHORT_FIELD_LENGTH
+      );
+
+      studentInfo.studentNumber = sanitizeText(
+        savedStudentInfo.studentNumber,
+        MAX_SHORT_FIELD_LENGTH
+      );
+
+      quizSections.forEach(
+        (section, sectionIndex) => {
+          section.questions.forEach(
+            (question, questionIndex) => {
+              const savedAnswer =
+                savedState.answers?.[sectionIndex]?.[
+                  questionIndex
+                ];
+
+              answers[sectionIndex][questionIndex] =
+                sanitizeText(
+                  savedAnswer,
+                  MAX_ANSWER_LENGTH
+                );
+            }
+          );
+        }
+      );
+
+      currentSection = clampNumber(
+        savedState.currentSection,
+        0,
+        quizSections.length - 1
+      );
+
+      completedCount = clampNumber(
+        savedState.completedCount,
+        0,
+        quizSections.length
+      );
+
+      quizStarted =
+        Boolean(savedState.quizStarted);
+
+      profileComplete =
+        Boolean(savedState.profileComplete);
+
+      const consecutiveCompletedSections =
+        answers.findIndex(sectionAnswers =>
+          !sectionAnswers.every(answer =>
+            answer.trim() !== ""
+          )
+        );
+
+      const safeCompletedCount =
+        consecutiveCompletedSections === -1
+          ? quizSections.length
+          : consecutiveCompletedSections;
+
+      completedCount = Math.min(
+        completedCount,
+        safeCompletedCount
+      );
+
+      if (
+        profileComplete &&
+        safeCompletedCount < quizSections.length
+      ) {
+        profileComplete = false;
+
+        startupNotice =
+          "The saved profile was incomplete, so it was reopened at the last valid section.";
+      }
+
+      currentSection = Math.min(
+        currentSection,
+        Math.min(
+          safeCompletedCount,
+          quizSections.length - 1
+        )
+      );
+
+      if (!hasCompleteStudentInfo()) {
+        clearSavedState();
+        resetMemoryOnly();
+
+        startupNotice =
+          "Saved progress did not contain complete student information and was safely cleared.";
+
+        return false;
+      }
+
+      if (profileComplete) {
+        completedCount = quizSections.length;
+      }
+
+      if (stored.key !== STORAGE_KEY) {
+        saveState();
+      }
+
+      return true;
+    }
+
+    function hasCompleteStudentInfo() {
+      return Boolean(
+        studentInfo.fullName.trim() &&
+        studentInfo.nickname.trim() &&
+        studentInfo.className.trim() &&
+        studentInfo.studentNumber.trim()
+      );
+    }
+
+    function resetMemoryOnly() {
+      answers.forEach(sectionAnswers => {
+        sectionAnswers.fill("");
+      });
+
+      studentInfo.fullName = "";
+      studentInfo.nickname = "";
+      studentInfo.className = "";
+      studentInfo.studentNumber = "";
+
+      currentSection = 0;
+      completedCount = 0;
+      quizStarted = false;
+      profileComplete = false;
+    }
+
+    function resetAllProfileData() {
+      resetMemoryOnly();
+      clearSavedState();
+    }
+
+    function resetQuizKeepStudent() {
+      answers.forEach(sectionAnswers => {
+        sectionAnswers.fill("");
+      });
+
+      currentSection = 0;
+      completedCount = 0;
+      quizStarted = true;
+      profileComplete = false;
+
+      saveState();
+    }
+
+    function buildPyramidHTML(allComplete = false) {
+      let html = `<div class="pyramid">`;
+
+      pyramidOrder.forEach(layer => {
+        const isCompleted =
+          allComplete ||
+          layer.sectionIndex < completedCount;
+
+        const isCurrent =
+          !allComplete &&
+          layer.sectionIndex === currentSection;
+
+        let stateClass =
+          isCompleted ? "completed" : "locked";
+
+        if (isCurrent) {
+          stateClass += " current";
+        }
+
+        const ariaCurrent =
+          isCurrent ? ' aria-current="step"' : "";
+
+        html += `
+          <div
+            class="
+              pyramid-layer
+              ${layer.className}
+              ${stateClass}
+            "
+            ${ariaCurrent}
+          >
+            <span class="layer-title">
+              ${layer.title}
+            </span>
+
+            <span class="layer-prompt">
+              ${layer.prompt}
+            </span>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+
+      return html;
+    }
+
+    function setProgressImage(stage) {
+      const safeStage = clampNumber(
+        stage,
+        0,
+        quizSections.length
+      );
+
+      studentImageFallback.hidden = true;
+      studentImage.style.display = "block";
+
+      studentImage.src =
+        `assets/girl-stage-${safeStage}.png`;
+
+      studentImage.alt =
+        `${safeStage} of ${quizSections.length} profile sections completed`;
+    }
+
+    studentImage.addEventListener(
+      "error",
+      function () {
+        this.style.display = "none";
+        studentImageFallback.hidden = false;
+      }
+    );
+
+    studentImage.addEventListener(
+      "load",
+      function () {
+        this.style.display = "block";
+        studentImageFallback.hidden = true;
+      }
+    );
+
+    function updateProgressDisplay() {
+      setProgressImage(completedCount);
+
+      progressStatus.textContent =
+        `${completedCount} of ${quizSections.length} sections completed`;
+
+      pyramidContainer.innerHTML =
+        buildPyramidHTML(false);
+    }
+
+    function saveCurrentAnswers() {
+      const textareas =
+        document.querySelectorAll("textarea");
+
+      textareas.forEach((textarea, index) => {
+        answers[currentSection][index] =
+          sanitizeText(
+            textarea.value.trim(),
+            MAX_ANSWER_LENGTH
+          );
+      });
+
+      saveState();
+    }
+
+    function renderResumeChoice() {
+      document.body.classList.remove(
+        "profile-complete",
+        "student-start",
+        "resume-choice"
+      );
+
+      document.body.classList.add(
+        "resume-choice"
+      );
+
+      errorMessage.style.display = "none";
+      stageText.textContent = "";
+      backButton.style.display = "none";
+      nextButton.style.display = "none";
+
+      const progressLabel = profileComplete
+        ? "Profile complete"
+        : `${completedCount} of ${quizSections.length} sections completed`;
+
+      quizContent.innerHTML = `
+        <section class="resume-card">
+
+          <h2>Saved profile found</h2>
+
+          ${showStartupNotice()}
+
+          <div class="shared-device-warning">
+            This may be a shared computer. Continue only if the profile below is yours.
+          </div>
+
+          <div class="saved-profile-summary">
+
+            <div class="saved-profile-item">
+              <span>Student</span>
+              <strong>${escapeHTML(studentInfo.fullName)}</strong>
+            </div>
+
+            <div class="saved-profile-item">
+              <span>Nickname</span>
+              <strong>${escapeHTML(studentInfo.nickname)}</strong>
+            </div>
+
+            <div class="saved-profile-item">
+              <span>Class</span>
+              <strong>${escapeHTML(studentInfo.className)}</strong>
+            </div>
+
+            <div class="saved-profile-item">
+              <span>Student number</span>
+              <strong>${escapeHTML(
+                maskStudentNumber(studentInfo.studentNumber)
+              )}</strong>
+            </div>
+
+            <div class="saved-profile-item">
+              <span>Progress</span>
+              <strong>${progressLabel}</strong>
+            </div>
+
+          </div>
+
+          <form id="resume-form" novalidate>
+
+            <div class="identity-check">
+
+              <label for="resume-student-number">
+                Enter your full student number to continue
+              </label>
+
+              <input
+                id="resume-student-number"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                maxlength="${MAX_SHORT_FIELD_LENGTH}"
+                aria-describedby="identity-help identity-error"
+                required
+              >
+
+              <p
+                id="identity-help"
+                class="identity-help"
+              >
+                This check helps protect profiles on shared school computers.
+              </p>
+
+              <p
+                id="identity-error"
+                class="identity-error"
+                role="alert"
+                aria-live="assertive"
+              >
+                The student number does not match this saved profile.
+              </p>
+
+            </div>
+
+            <div class="resume-actions">
+
+              <button
+                id="continue-profile-button"
+                type="submit"
+              >
+                Continue previous profile
+              </button>
+
+              <button
+                id="new-profile-button"
+                type="button"
+              >
+                Start new profile
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+      `;
+
+      const resumeInput =
+        document.getElementById(
+          "resume-student-number"
+        );
+
+      const identityError =
+        document.getElementById(
+          "identity-error"
+        );
+
+      document
+        .getElementById("resume-form")
+        .addEventListener(
+          "submit",
+          function (event) {
+            event.preventDefault();
+
+            const enteredNumber =
+              resumeInput.value.trim();
+
+            if (
+              enteredNumber !==
+              studentInfo.studentNumber.trim()
+            ) {
+              identityError.style.display = "block";
+              resumeInput.setAttribute(
+                "aria-invalid",
+                "true"
+              );
+              resumeInput.focus();
+              return;
+            }
+
+            identityError.style.display = "none";
+            resumeInput.removeAttribute(
+              "aria-invalid"
+            );
+
+            document.body.classList.remove(
+              "resume-choice"
+            );
+
+            backButton.style.display =
+              "inline-block";
+
+            nextButton.style.display =
+              "inline-block";
+
+            if (profileComplete) {
+              showCompletionScreen();
+            } else {
+              renderSection();
+            }
+          }
+        );
+
+      document
+        .getElementById("new-profile-button")
+        .addEventListener(
+          "click",
+          function () {
+            const confirmed = window.confirm(
+              "Delete the saved profile and start a new one? This cannot be undone."
+            );
+
+            if (!confirmed) {
+              return;
+            }
+
+            resetAllProfileData();
+            renderStudentStart();
+          }
+        );
+
+      resumeInput.focus();
+    }
+
+    function renderStudentStart() {
+      profileComplete = false;
+      quizStarted = false;
+
+      document.body.classList.remove(
+        "profile-complete",
+        "resume-choice"
+      );
+
+      document.body.classList.add(
+        "student-start"
+      );
+
+      errorMessage.style.display = "none";
+      stageText.textContent = "";
+      backButton.style.display = "none";
+      nextButton.style.display = "none";
+
+      quizContent.innerHTML = `
+        <section class="student-start-card">
+
+          <h2>Student Information</h2>
+
+          ${showStartupNotice()}
+
+          <p>
+            Enter your information before starting your interview profile.
+          </p>
+
+          <div class="shared-device-warning">
+            Progress is saved only in this browser. On a shared computer, use
+            <strong>Finish and clear saved data</strong>
+            when you are done.
+          </div>
+
+          <div
+            id="student-form-error"
+            class="student-form-error"
+            role="alert"
+            aria-live="assertive"
+          >
+            Please complete all four fields.
+          </div>
+
+          <form id="student-info-form" novalidate>
+
+            <div class="student-fields">
+
+              <div class="student-field">
+                <label for="student-full-name">
+                  Full name
+                </label>
+
+                <input
+                  id="student-full-name"
+                  type="text"
+                  autocomplete="name"
+                  maxlength="${MAX_NAME_LENGTH}"
+                  value="${escapeHTML(studentInfo.fullName)}"
+                  placeholder="Enter your full name"
+                  required
+                >
+              </div>
+
+              <div class="student-field">
+                <label for="student-nickname">
+                  Nickname
+                </label>
+
+                <input
+                  id="student-nickname"
+                  type="text"
+                  autocomplete="nickname"
+                  maxlength="${MAX_SHORT_FIELD_LENGTH}"
+                  value="${escapeHTML(studentInfo.nickname)}"
+                  placeholder="Enter your nickname"
+                  required
+                >
+              </div>
+
+              <div class="student-field">
+                <label for="student-class">
+                  Class
+                </label>
+
+                <input
+                  id="student-class"
+                  type="text"
+                  maxlength="${MAX_SHORT_FIELD_LENGTH}"
+                  value="${escapeHTML(studentInfo.className)}"
+                  placeholder="Example: M.6/2"
+                  required
+                >
+              </div>
+
+              <div class="student-field">
+                <label for="student-number">
+                  Student number
+                </label>
+
+                <input
+                  id="student-number"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  maxlength="${MAX_SHORT_FIELD_LENGTH}"
+                  value="${escapeHTML(studentInfo.studentNumber)}"
+                  placeholder="Enter your student number"
+                  required
+                >
+              </div>
+
+            </div>
+
+            <button
+              class="start-quiz-button"
+              type="submit"
+            >
+              Start the quiz
+            </button>
+
+          </form>
+
+        </section>
+      `;
+
+      const studentForm =
+        document.getElementById(
+          "student-info-form"
+        );
+
+      const fieldIds = [
+        "student-full-name",
+        "student-nickname",
+        "student-class",
+        "student-number"
+      ];
+
+      studentForm.addEventListener(
+        "submit",
+        function (event) {
+          event.preventDefault();
+
+          const values = fieldIds.map(id =>
+            document.getElementById(id).value.trim()
+          );
+
+          const formError =
+            document.getElementById(
+              "student-form-error"
+            );
+
+          let firstInvalid = null;
+
+          fieldIds.forEach((id, index) => {
+            const input =
+              document.getElementById(id);
+
+            if (!values[index]) {
+              input.setAttribute(
+                "aria-invalid",
+                "true"
+              );
+
+              firstInvalid ||= input;
+            } else {
+              input.removeAttribute(
+                "aria-invalid"
+              );
+            }
+          });
+
+          if (firstInvalid) {
+            formError.style.display = "block";
+            firstInvalid.focus();
+            return;
+          }
+
+          formError.style.display = "none";
+
+          studentInfo.fullName = sanitizeText(
+            values[0],
+            MAX_NAME_LENGTH
+          );
+
+          studentInfo.nickname = sanitizeText(
+            values[1],
+            MAX_SHORT_FIELD_LENGTH
+          );
+
+          studentInfo.className = sanitizeText(
+            values[2],
+            MAX_SHORT_FIELD_LENGTH
+          );
+
+          studentInfo.studentNumber = sanitizeText(
+            values[3],
+            MAX_SHORT_FIELD_LENGTH
+          );
+
+          quizStarted = true;
+          profileComplete = false;
+          currentSection = 0;
+          completedCount = 0;
+
+          document.body.classList.remove(
+            "student-start"
+          );
+
+          backButton.style.display =
+            "inline-block";
+
+          nextButton.style.display =
+            "inline-block";
+
+          saveState();
+          renderSection();
+        }
+      );
+
+      document
+        .getElementById("student-full-name")
+        .focus();
+    }
+
+    function renderSection() {
+      document.body.classList.remove(
+        "profile-complete",
+        "student-start",
+        "resume-choice"
+      );
+
+      errorMessage.style.display = "none";
+
+      const section =
+        quizSections[currentSection];
+
+      stageText.textContent =
+        `Section ${currentSection + 1} of ${quizSections.length}`;
+
+      let html = `
+        <h2
+          id="section-heading"
+          tabindex="-1"
+        >
+          ${section.title}
+        </h2>
+      `;
+
+      section.questions.forEach((item, index) => {
+        const currentAnswer =
+          answers[currentSection][index];
+
+        html += `
+          <div class="question-card">
+
+            <label for="answer-${index}">
+              ${index + 1}. ${item.question}
+            </label>
+
+            <textarea
+              id="answer-${index}"
+              maxlength="${MAX_ANSWER_LENGTH}"
+              aria-describedby="counter-${index}"
+              placeholder="Write your answer here"
+            >${escapeHTML(currentAnswer)}</textarea>
+
+            <span
+              id="counter-${index}"
+              class="char-count"
+              aria-live="polite"
+            >
+              ${currentAnswer.length} / ${MAX_ANSWER_LENGTH}
+            </span>
+
+            <button
+              type="button"
+              class="example-button"
+              data-example="${index}"
+              aria-expanded="false"
+              aria-controls="example-${index}"
+            >
+              Show example
+            </button>
+
+            <div
+              id="example-${index}"
+              class="example-box"
+            >
+              ${item.example}
+            </div>
+
+          </div>
+        `;
+      });
+
+      quizContent.innerHTML = html;
+
+      document
+        .querySelectorAll(".example-button")
+        .forEach(button => {
+          button.addEventListener(
+            "click",
+            function () {
+              const exampleNumber =
+                this.dataset.example;
+
+              const exampleBox =
+                document.getElementById(
+                  `example-${exampleNumber}`
+                );
+
+              const isVisible =
+                exampleBox.style.display === "block";
+
+              exampleBox.style.display =
+                isVisible ? "none" : "block";
+
+              this.textContent =
+                isVisible
+                  ? "Show example"
+                  : "Hide example";
+
+              this.setAttribute(
+                "aria-expanded",
+                String(!isVisible)
+              );
+            }
+          );
+        });
+
+      document
+        .querySelectorAll("textarea")
+        .forEach((textarea, index) => {
+          textarea.addEventListener(
+            "input",
+            function () {
+              const safeValue = sanitizeText(
+                this.value,
+                MAX_ANSWER_LENGTH
+              );
+
+              if (safeValue !== this.value) {
+                this.value = safeValue;
+              }
+
+              answers[currentSection][index] =
+                safeValue;
+
+              document.getElementById(
+                `counter-${index}`
+              ).textContent =
+                `${safeValue.length} / ${MAX_ANSWER_LENGTH}`;
+
+              this.removeAttribute(
+                "aria-invalid"
+              );
+
+              saveState();
+            }
+          );
+        });
+
+      backButton.disabled =
+        currentSection === 0;
+
+      nextButton.textContent =
+        currentSection ===
+        quizSections.length - 1
+          ? "Finish"
+          : "Next";
+
+      updateProgressDisplay();
+
+      document
+        .getElementById("section-heading")
+        .focus();
+    }
+
+    function validateCurrentSection() {
+      const textareas =
+        Array.from(
+          document.querySelectorAll("textarea")
+        );
+
+      let firstInvalid = null;
+
+      textareas.forEach(textarea => {
+        if (!textarea.value.trim()) {
+          textarea.setAttribute(
+            "aria-invalid",
+            "true"
+          );
+
+          firstInvalid ||= textarea;
+        } else {
+          textarea.removeAttribute(
+            "aria-invalid"
+          );
+        }
+      });
+
+      if (firstInvalid) {
+        errorMessage.style.display = "block";
+        firstInvalid.focus();
+        return false;
+      }
+
+      errorMessage.style.display = "none";
+      return true;
+    }
+
+    nextButton.addEventListener(
+      "click",
+      function () {
+        saveCurrentAnswers();
+
+        if (!validateCurrentSection()) {
+          return;
+        }
+
+        completedCount = Math.max(
+          completedCount,
+          currentSection + 1
+        );
+
+        saveState();
+
+        if (
+          currentSection <
+          quizSections.length - 1
+        ) {
+          currentSection++;
+          saveState();
+          renderSection();
+        } else {
+          showCompletionScreen();
+        }
+      }
+    );
+
+    backButton.addEventListener(
+      "click",
+      function () {
+        saveCurrentAnswers();
+
+        if (currentSection > 0) {
+          currentSection--;
+          saveState();
+          renderSection();
+        }
+      }
+    );
+
+    function attachFinalImageFallback() {
+      const finalImage =
+        document.querySelector(
+          ".final-student-image"
+        );
+
+      const finalFallback =
+        document.querySelector(
+          ".final-image-fallback"
+        );
+
+      if (!finalImage || !finalFallback) {
+        return;
+      }
+
+      finalImage.addEventListener(
+        "error",
+        function () {
+          this.style.display = "none";
+          finalFallback.hidden = false;
+        }
+      );
+
+      finalImage.addEventListener(
+        "load",
+        function () {
+          this.style.display = "block";
+          finalFallback.hidden = true;
+        }
+      );
+    }
+
+    function showCompletionScreen() {
+      document.body.classList.remove(
+        "student-start",
+        "resume-choice"
+      );
+
+      document.body.classList.add(
+        "profile-complete"
+      );
+
+      stageText.textContent =
+        "Profile complete";
+
+      completedCount =
+        quizSections.length;
+
+      quizStarted = true;
+      profileComplete = true;
+      saveState();
+
+      const generatedDate =
+        formatDateTime(new Date());
+
+      let profileHTML = `
+        <section class="profile-cover">
+
+          <div class="cover-copy">
+
+            <p class="cover-label">
+              University interview preparation
+            </p>
+
+            <h2>My Interview Profile</h2>
+
+            <p>
+              This profile organizes my future goal,
+              achievements, experiences, strengths,
+              interests and area to improve.
+            </p>
+
+            <div class="student-details">
+
+              <div class="student-detail">
+                <span>Student</span>
+                <strong>${formatAnswer(studentInfo.fullName)}</strong>
+              </div>
+
+              <div class="student-detail">
+                <span>Nickname</span>
+                <strong>${formatAnswer(studentInfo.nickname)}</strong>
+              </div>
+
+              <div class="student-detail">
+                <span>Class</span>
+                <strong>${formatAnswer(studentInfo.className)}</strong>
+              </div>
+
+              <div class="student-detail">
+                <span>Student number</span>
+                <strong>${formatAnswer(studentInfo.studentNumber)}</strong>
+              </div>
+
+            </div>
+
+            <div class="goal-highlight">
+              <span>My future job</span>
+              <strong>${formatAnswer(answers[0][1])}</strong>
+            </div>
+
+            <p class="profile-print-meta">
+              Generated: ${escapeHTML(generatedDate)}
+            </p>
+
+          </div>
+
+          <div class="cover-visual">
+
+            <img
+              class="final-student-image"
+              src="assets/girl-stage-6.png"
+              alt="Completed university student profile"
+            >
+
+            <div
+              class="final-image-fallback"
+              role="status"
+              hidden
+            >
+              The final student image is unavailable. The completed pyramid and profile remain valid.
+            </div>
+
+            <div class="final-pyramid">
+              ${buildPyramidHTML(true)}
+            </div>
+
+          </div>
+
+        </section>
+
+        <p class="profile-introduction">
+          Define your goal first. Choose information
+          that supports this goal.
+        </p>
+
+        <div class="profile-summary">
+      `;
+
+      quizSections.forEach(
+        (section, sectionIndex) => {
+          profileHTML += `
+            <section
+              class="profile-section section-color-${sectionIndex}"
+            >
+
+              <div class="profile-section-header">
+
+                <span class="profile-section-number">
+                  ${sectionIndex + 1}
+                </span>
+
+                <h3>${section.title}</h3>
+
+              </div>
+          `;
+
+          section.questions.forEach(
+            (item, questionIndex) => {
+              profileHTML += `
+                <div class="profile-item">
+
+                  <p class="profile-question">
+                    ${item.question}
+                  </p>
+
+                  <p class="profile-answer">
+                    ${formatAnswer(
+                      answers[sectionIndex][questionIndex]
+                    )}
+                  </p>
+
+                </div>
+              `;
+            }
+          );
+
+          profileHTML += `</section>`;
+        }
+      );
+
+      profileHTML += `
+        </div>
+
+        <footer class="profile-footer">
+          My Interview Profile ·
+          ${escapeHTML(studentInfo.fullName)}
+          (${escapeHTML(studentInfo.nickname)}) ·
+          ${escapeHTML(studentInfo.className)} ·
+          Student No. ${escapeHTML(studentInfo.studentNumber)} ·
+          Generated ${escapeHTML(generatedDate)}
+        </footer>
+
+        <div class="completion-actions screen-only">
+
+          <button
+            id="edit-profile-button"
+            type="button"
+          >
+            Edit answers
+          </button>
+
+          <button
+            id="print-profile-button"
+            type="button"
+          >
+            Print / Save as PDF
+          </button>
+
+          <button
+            id="restart-quiz-button"
+            type="button"
+          >
+            Restart quiz
+          </button>
+
+          <button
+            id="finish-clear-button"
+            type="button"
+          >
+            Finish and clear saved data
+          </button>
+
+        </div>
+      `;
+
+      quizContent.innerHTML =
+        profileHTML;
+
+      backButton.style.display =
+        "none";
+
+      nextButton.style.display =
+        "none";
+
+      attachFinalImageFallback();
+
+      document
+        .getElementById(
+          "edit-profile-button"
+        )
+        .addEventListener(
+          "click",
+          function () {
+            currentSection = 0;
+            profileComplete = false;
+            saveState();
+
+            backButton.style.display =
+              "inline-block";
+
+            nextButton.style.display =
+              "inline-block";
+
+            renderSection();
+          }
+        );
+
+      document
+        .getElementById(
+          "print-profile-button"
+        )
+        .addEventListener(
+          "click",
+          function () {
+            window.print();
+          }
+        );
+
+      document
+        .getElementById(
+          "restart-quiz-button"
+        )
+        .addEventListener(
+          "click",
+          function () {
+            const confirmed =
+              window.confirm(
+                `Clear all answers and restart the quiz for ${studentInfo.nickname}? Student information will be kept.`
+              );
+
+            if (!confirmed) {
+              return;
+            }
+
+            resetQuizKeepStudent();
+
+            backButton.style.display =
+              "inline-block";
+
+            nextButton.style.display =
+              "inline-block";
+
+            renderSection();
+          }
+        );
+
+      document
+        .getElementById(
+          "finish-clear-button"
+        )
+        .addEventListener(
+          "click",
+          function () {
+            const confirmed =
+              window.confirm(
+                "Make sure you have printed or saved your PDF. This will permanently delete the student information, answers and progress saved in this browser. Continue?"
+              );
+
+            if (!confirmed) {
+              return;
+            }
+
+            resetAllProfileData();
+            renderClearedScreen();
+          }
+        );
+    }
+
+    function renderClearedScreen() {
+      document.body.classList.remove(
+        "profile-complete",
+        "resume-choice"
+      );
+
+      document.body.classList.add(
+        "student-start"
+      );
+
+      errorMessage.style.display = "none";
+      stageText.textContent = "";
+      backButton.style.display = "none";
+      nextButton.style.display = "none";
+
+      quizContent.innerHTML = `
+        <section class="cleared-card">
+
+          <h2>Profile finished</h2>
+
+          <p>
+            The student information, answers and progress have been removed from this browser.
+          </p>
+
+          <p>
+            You may close this page safely or start another profile.
+          </p>
+
+          <button
+            id="start-another-profile-button"
+            type="button"
+          >
+            Start another profile
+          </button>
+
+        </section>
+      `;
+
+      document
+        .getElementById(
+          "start-another-profile-button"
+        )
+        .addEventListener(
+          "click",
+          renderStudentStart
+        );
+    }
+
+    const hasSavedState =
+      loadSavedState();
+
+    if (
+      hasSavedState &&
+      quizStarted &&
+      hasCompleteStudentInfo()
+    ) {
+      renderResumeChoice();
+    } else {
+      renderStudentStart();
+    }
+  </script>
+
+</body>
+</html>
