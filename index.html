@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
 
+  <meta name="color-scheme" content="light">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -1257,7 +1259,8 @@
 
     @media print {
       .profile-cover {
-        page-break-after: always;
+        page-break-after: auto !important;
+        break-after: auto !important;
       }
 
       .profile-footer {
@@ -2342,6 +2345,81 @@
       }
     }
 
+    /* Reliability fixes: light PDF output and natural pagination */
+    :root {
+      color-scheme: light;
+    }
+
+    @media print {
+      html,
+      body {
+        color-scheme: light !important;
+        background: #ffffff !important;
+        color: #111111 !important;
+      }
+
+      body::before,
+      body::after {
+        display: none !important;
+      }
+
+      .quiz-container,
+      .quiz-panel,
+      #quiz-content,
+      .profile-summary {
+        background: #ffffff !important;
+      }
+
+      .profile-cover {
+        page-break-after: auto !important;
+        break-after: auto !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .profile-introduction {
+        page-break-before: auto !important;
+        break-before: auto !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        background: #f1eafd !important;
+        color: #3b1e5d !important;
+      }
+
+      .profile-summary {
+        page-break-before: auto !important;
+        break-before: auto !important;
+      }
+
+      .profile-section {
+        page-break-before: auto !important;
+        break-before: auto !important;
+        page-break-after: auto !important;
+        break-after: auto !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .profile-answer,
+      .student-detail,
+      .goal-highlight,
+      .cover-visual {
+        background: #ffffff !important;
+      }
+
+      .profile-question,
+      .profile-answer,
+      .student-detail,
+      .goal-highlight {
+        color: #222222 !important;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
   </style>
 </head>
 
@@ -2755,28 +2833,63 @@
       return [STORAGE_KEY, ...LEGACY_STORAGE_KEYS];
     }
 
+    function getAvailableStorages() {
+      const storages = [];
+
+      try {
+        const testKey = "__interviewQuizStorageTest__";
+        localStorage.setItem(testKey, "1");
+        localStorage.removeItem(testKey);
+        storages.push({
+          name: "localStorage",
+          storage: localStorage
+        });
+      } catch (error) {
+        console.warn("localStorage is unavailable.", error);
+      }
+
+      try {
+        const testKey = "__interviewQuizSessionTest__";
+        sessionStorage.setItem(testKey, "1");
+        sessionStorage.removeItem(testKey);
+        storages.push({
+          name: "sessionStorage",
+          storage: sessionStorage
+        });
+      } catch (error) {
+        console.warn("sessionStorage is unavailable.", error);
+      }
+
+      return storages;
+    }
+
     function clearSavedState() {
-      getStorageKeys().forEach(key => {
-        try {
-          localStorage.removeItem(key);
-        } catch (error) {
-          console.warn(
-            "Saved progress could not be cleared.",
-            error
-          );
-        }
+      const storages = getAvailableStorages();
+
+      storages.forEach(({ storage }) => {
+        getStorageKeys().forEach(key => {
+          try {
+            storage.removeItem(key);
+          } catch (error) {
+            console.warn(
+              "Saved progress could not be cleared.",
+              error
+            );
+          }
+        });
       });
     }
 
-    function saveState() {
+    function buildStateSnapshot() {
       const safeAnswers = answers.map(sectionAnswers =>
         sectionAnswers.map(answer =>
           sanitizeText(answer, MAX_ANSWER_LENGTH)
         )
       );
 
-      const state = {
+      return {
         version: STORAGE_VERSION,
+        savedAt: Date.now(),
         quizStarted,
         profileComplete,
         currentSection,
@@ -2801,49 +2914,97 @@
         },
         answers: safeAnswers
       };
+    }
 
-      try {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(state)
-        );
+    function saveState() {
+      const state = buildStateSnapshot();
+      const serializedState = JSON.stringify(state);
+      const storages = getAvailableStorages();
 
-        LEGACY_STORAGE_KEYS.forEach(key => {
-          localStorage.removeItem(key);
-        });
-      } catch (error) {
+      let savedSuccessfully = false;
+
+      storages.forEach(({ storage }) => {
+        try {
+          storage.setItem(
+            STORAGE_KEY,
+            serializedState
+          );
+
+          LEGACY_STORAGE_KEYS.forEach(key => {
+            storage.removeItem(key);
+          });
+
+          savedSuccessfully = true;
+        } catch (error) {
+          console.warn(
+            "Progress could not be saved in one browser storage.",
+            error
+          );
+        }
+      });
+
+      if (!savedSuccessfully) {
         startupNotice =
           "Automatic saving is unavailable in this browser. Keep this page open until you finish.";
-
-        console.warn(
-          "Progress could not be saved.",
-          error
-        );
       }
+
+      return savedSuccessfully;
     }
 
     function findSavedState() {
-      for (const key of getStorageKeys()) {
-        try {
-          const value = localStorage.getItem(key);
+      const candidates = [];
+      const storages = getAvailableStorages();
 
-          if (value) {
-            return { key, value };
+      storages.forEach(({ name, storage }) => {
+        getStorageKeys().forEach(key => {
+          try {
+            const value = storage.getItem(key);
+
+            if (!value) {
+              return;
+            }
+
+            let parsed = null;
+
+            try {
+              parsed = JSON.parse(value);
+            } catch (error) {
+              console.warn(
+                `Ignoring damaged saved progress from ${name}.`,
+                error
+              );
+              return;
+            }
+
+            candidates.push({
+              key,
+              value,
+              storageName: name,
+              savedAt: Number(parsed?.savedAt) || 0
+            });
+          } catch (error) {
+            console.warn(
+              `Saved progress could not be accessed from ${name}.`,
+              error
+            );
           }
-        } catch (error) {
+        });
+      });
+
+      if (!candidates.length) {
+        if (!storages.length) {
           startupNotice =
             "Automatic saving is unavailable in this browser. Keep this page open until you finish.";
-
-          console.warn(
-            "Saved progress could not be accessed.",
-            error
-          );
-
-          return null;
         }
+
+        return null;
       }
 
-      return null;
+      candidates.sort(
+        (a, b) => b.savedAt - a.savedAt
+      );
+
+      return candidates[0];
     }
 
     function loadSavedState() {
@@ -4216,6 +4377,72 @@
           renderStudentStart
         );
     }
+
+    async function requestPersistentStorage() {
+      try {
+        if (
+          navigator.storage &&
+          typeof navigator.storage.persist === "function"
+        ) {
+          await navigator.storage.persist();
+        }
+      } catch (error) {
+        console.warn(
+          "Persistent storage could not be requested.",
+          error
+        );
+      }
+    }
+
+    function flushVisibleAnswersBeforeLeaving() {
+      if (
+        !quizStarted ||
+        profileComplete ||
+        document.body.classList.contains("student-start") ||
+        document.body.classList.contains("resume-choice")
+      ) {
+        saveState();
+        return;
+      }
+
+      const visibleTextareas =
+        document.querySelectorAll("#quiz-content textarea");
+
+      if (visibleTextareas.length) {
+        visibleTextareas.forEach((textarea, index) => {
+          if (answers[currentSection]) {
+            answers[currentSection][index] =
+              sanitizeText(
+                textarea.value,
+                MAX_ANSWER_LENGTH
+              );
+          }
+        });
+      }
+
+      saveState();
+    }
+
+    window.addEventListener(
+      "pagehide",
+      flushVisibleAnswersBeforeLeaving
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      function () {
+        if (document.visibilityState === "hidden") {
+          flushVisibleAnswersBeforeLeaving();
+        }
+      }
+    );
+
+    window.addEventListener(
+      "beforeunload",
+      flushVisibleAnswersBeforeLeaving
+    );
+
+    requestPersistentStorage();
 
     const hasSavedState =
       loadSavedState();
