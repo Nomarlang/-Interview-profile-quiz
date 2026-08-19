@@ -2420,7 +2420,209 @@
       }
     }
 
+    /* Reliable PDF export: fixed light A4 pages rendered to canvas */
+    .pdf-export-root {
+      position: fixed;
+      left: -20000px;
+      top: 0;
+      width: 794px;
+      z-index: -1;
+      pointer-events: none;
+      color-scheme: light !important;
+      font-family: Arial, sans-serif;
+    }
+
+    .pdf-export-page {
+      width: 794px;
+      min-height: 1123px;
+      padding: 44px 48px 42px;
+      color: #1b1730 !important;
+      background: #ffffff !important;
+      overflow: hidden;
+      page-break-after: always;
+    }
+
+    .pdf-export-page * {
+      color-scheme: light !important;
+    }
+
+    .pdf-export-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #eadff8;
+    }
+
+    .pdf-export-title-wrap h1 {
+      margin: 0 0 4px;
+      color: #2d145a !important;
+      font-size: 28px;
+      line-height: 1.1;
+    }
+
+    .pdf-export-title-wrap p {
+      margin: 0;
+      color: #6f6a7d !important;
+      font-size: 12px;
+    }
+
+    .pdf-export-badge {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      color: #5a2c8a !important;
+      background: #f4eafd !important;
+      border: 1px solid #d8b7f0;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .pdf-export-student {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .pdf-export-meta {
+      padding: 10px 12px;
+      background: #faf9fd !important;
+      border: 1px solid #e7dff2;
+      border-radius: 10px;
+    }
+
+    .pdf-export-meta span {
+      display: block;
+      margin-bottom: 3px;
+      color: #6f6a7d !important;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .35px;
+    }
+
+    .pdf-export-meta strong {
+      display: block;
+      color: #2d145a !important;
+      font-size: 12px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .pdf-export-goal {
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #f4eafd, #fbf8ff) !important;
+      border: 1px solid #d8b7f0;
+      border-left: 6px solid #9658d2;
+      border-radius: 12px;
+    }
+
+    .pdf-export-goal span {
+      display: block;
+      margin-bottom: 4px;
+      color: #6f6a7d !important;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .pdf-export-goal strong {
+      display: block;
+      color: #4d276f !important;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .pdf-export-section {
+      margin-bottom: 16px;
+      padding: 14px 16px 12px;
+      background: #ffffff !important;
+      border: 1px solid #e6e0ec;
+      border-top: 5px solid var(--pdf-section-color, #8750c7);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(60, 39, 82, .05);
+      break-inside: avoid;
+    }
+
+    .pdf-export-section h2 {
+      margin: 0 0 10px;
+      color: #2d145a !important;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .pdf-export-item {
+      margin-top: 9px;
+    }
+
+    .pdf-export-question {
+      margin: 0 0 4px;
+      color: #4d4855 !important;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .pdf-export-answer {
+      margin: 0;
+      padding: 8px 10px;
+      color: #201b2c !important;
+      background: #fbfbfc !important;
+      border-left: 4px solid var(--pdf-section-color, #8750c7);
+      border-radius: 6px;
+      font-size: 10px;
+      line-height: 1.42;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .pdf-export-footer {
+      margin-top: 18px;
+      padding-top: 10px;
+      color: #7a7482 !important;
+      border-top: 1px solid #e8e3ed;
+      font-size: 9px;
+      text-align: center;
+    }
+
+    .pdf-download-status {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 12px;
+      color: #4d276f;
+      background: #f4eafd;
+      border: 1px solid #d8b7f0;
+      border-radius: 9px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    #download-pdf-button {
+      color: white;
+      background: linear-gradient(135deg, #9d6cdf, #6f3db4);
+    }
+
+    #download-pdf-button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
   </style>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
+    defer
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+    defer
+  ></script>
+
 </head>
 
 <body>
@@ -4041,6 +4243,272 @@
       );
     }
 
+
+    const PDF_SECTION_COLORS = [
+      "#9658d2",
+      "#a17bd6",
+      "#65b9e8",
+      "#52c9c1",
+      "#f1bf36",
+      "#9b96a3"
+    ];
+
+    function safeFileNamePart(value) {
+      const cleaned = String(value || "")
+        .trim()
+        .replace(/[\\/:*?"<>|]+/g, "-")
+        .replace(/\s+/g, "_")
+        .replace(/_+/g, "_");
+
+      return cleaned || "Student";
+    }
+
+    function buildPDFSectionHTML(sectionIndex) {
+      const section = quizSections[sectionIndex];
+      const color = PDF_SECTION_COLORS[sectionIndex];
+
+      let sectionHTML = `
+        <section
+          class="pdf-export-section"
+          style="--pdf-section-color:${color}"
+        >
+          <h2>${sectionIndex + 1}. ${escapeHTML(section.title)}</h2>
+      `;
+
+      section.questions.forEach((item, questionIndex) => {
+        sectionHTML += `
+          <div class="pdf-export-item">
+            <p class="pdf-export-question">
+              ${escapeHTML(item.question)}
+            </p>
+            <p class="pdf-export-answer">${formatAnswer(
+              answers[sectionIndex][questionIndex]
+            )}</p>
+          </div>
+        `;
+      });
+
+      sectionHTML += `</section>`;
+      return sectionHTML;
+    }
+
+    function buildPDFPages() {
+      const generatedDate = formatDateTime(new Date());
+
+      const root = document.createElement("div");
+      root.className = "pdf-export-root";
+      root.setAttribute("aria-hidden", "true");
+
+      const studentMetaHTML = `
+        <div class="pdf-export-student">
+          <div class="pdf-export-meta">
+            <span>Student</span>
+            <strong>${formatAnswer(studentInfo.fullName)}</strong>
+          </div>
+          <div class="pdf-export-meta">
+            <span>Nickname</span>
+            <strong>${formatAnswer(studentInfo.nickname)}</strong>
+          </div>
+          <div class="pdf-export-meta">
+            <span>Class</span>
+            <strong>${formatAnswer(studentInfo.className)}</strong>
+          </div>
+          <div class="pdf-export-meta">
+            <span>Student number</span>
+            <strong>${formatAnswer(studentInfo.studentNumber)}</strong>
+          </div>
+        </div>
+      `;
+
+      const pageHeader = pageNumber => `
+        <header class="pdf-export-header">
+          <div class="pdf-export-title-wrap">
+            <h1>My Interview Profile</h1>
+            <p>University interview preparation</p>
+          </div>
+          <div class="pdf-export-badge">
+            Page ${pageNumber} of 3
+          </div>
+        </header>
+      `;
+
+      const footer = `
+        <footer class="pdf-export-footer">
+          ${escapeHTML(studentInfo.fullName)}
+          (${escapeHTML(studentInfo.nickname)}) ·
+          ${escapeHTML(studentInfo.className)} ·
+          Student No. ${escapeHTML(studentInfo.studentNumber)} ·
+          Generated ${escapeHTML(generatedDate)}
+        </footer>
+      `;
+
+      root.innerHTML = `
+        <section class="pdf-export-page">
+          ${pageHeader(1)}
+          ${studentMetaHTML}
+          <div class="pdf-export-goal">
+            <span>My future job</span>
+            <strong>${formatAnswer(answers[0][1])}</strong>
+          </div>
+          ${buildPDFSectionHTML(0)}
+          ${buildPDFSectionHTML(1)}
+          ${footer}
+        </section>
+
+        <section class="pdf-export-page">
+          ${pageHeader(2)}
+          ${buildPDFSectionHTML(2)}
+          ${buildPDFSectionHTML(3)}
+          ${footer}
+        </section>
+
+        <section class="pdf-export-page">
+          ${pageHeader(3)}
+          ${buildPDFSectionHTML(4)}
+          ${buildPDFSectionHTML(5)}
+          ${footer}
+        </section>
+      `;
+
+      document.body.appendChild(root);
+      return root;
+    }
+
+    async function generateProfilePDF() {
+      const status =
+        document.getElementById("pdf-download-status");
+
+      const downloadButton =
+        document.getElementById("download-pdf-button");
+
+      if (
+        typeof window.html2canvas !== "function" ||
+        !window.jspdf ||
+        !window.jspdf.jsPDF
+      ) {
+        if (status) {
+          status.style.display = "block";
+          status.textContent =
+            "PDF download could not load on this device. Use the Print / Save as PDF fallback button.";
+        }
+        return;
+      }
+
+      if (downloadButton) {
+        downloadButton.disabled = true;
+      }
+
+      if (status) {
+        status.style.display = "block";
+        status.textContent =
+          "Preparing your PDF… Please keep this page open.";
+      }
+
+      const exportRoot = buildPDFPages();
+
+      try {
+        // Let the browser finish layout before capturing.
+        await new Promise(resolve =>
+          requestAnimationFrame(() =>
+            requestAnimationFrame(resolve)
+          )
+        );
+
+        const pages =
+          Array.from(
+            exportRoot.querySelectorAll(".pdf-export-page")
+          );
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+          compress: true
+        });
+
+        const pageWidth = 210;
+        const pageHeight = 297;
+
+        for (let index = 0; index < pages.length; index++) {
+          if (status) {
+            status.textContent =
+              `Preparing PDF page ${index + 1} of ${pages.length}…`;
+          }
+
+          const canvas = await window.html2canvas(
+            pages[index],
+            {
+              backgroundColor: "#ffffff",
+              scale: 1.35,
+              useCORS: true,
+              logging: false,
+              windowWidth: 794,
+              width: 794
+            }
+          );
+
+          const imageData =
+            canvas.toDataURL("image/jpeg", 0.93);
+
+          if (index > 0) {
+            pdf.addPage("a4", "portrait");
+          }
+
+          pdf.addImage(
+            imageData,
+            "JPEG",
+            0,
+            0,
+            pageWidth,
+            pageHeight,
+            undefined,
+            "FAST"
+          );
+
+          // Free memory as soon as possible on Android devices.
+          canvas.width = 1;
+          canvas.height = 1;
+        }
+
+        const fileName =
+          `Interview_Profile_${safeFileNamePart(
+            studentInfo.nickname || studentInfo.fullName
+          )}_${safeFileNamePart(
+            studentInfo.className
+          )}.pdf`;
+
+        if (status) {
+          status.textContent =
+            "PDF ready. Starting download…";
+        }
+
+        pdf.save(fileName);
+
+        if (status) {
+          status.textContent =
+            "PDF created successfully.";
+        }
+      } catch (error) {
+        console.error(
+          "Direct PDF generation failed.",
+          error
+        );
+
+        if (status) {
+          status.style.display = "block";
+          status.textContent =
+            "Direct PDF download failed on this device. Please use Print / Save as PDF (fallback).";
+        }
+      } finally {
+        exportRoot.remove();
+
+        if (downloadButton) {
+          downloadButton.disabled = false;
+        }
+      }
+    }
+
     function showCompletionScreen() {
       clearSectionTheme();
       document.body.classList.remove(
@@ -4213,11 +4681,25 @@
           </button>
 
           <button
+            id="download-pdf-button"
+            type="button"
+          >
+            Download PDF
+          </button>
+
+          <button
             id="print-profile-button"
             type="button"
           >
-            Print / Save as PDF
+            Print / Save as PDF (fallback)
           </button>
+
+          <div
+            id="pdf-download-status"
+            class="pdf-download-status"
+            role="status"
+            aria-live="polite"
+          ></div>
 
           <button
             id="restart-quiz-button"
@@ -4266,6 +4748,15 @@
 
             renderSection();
           }
+        );
+
+      document
+        .getElementById(
+          "download-pdf-button"
+        )
+        .addEventListener(
+          "click",
+          generateProfilePDF
         );
 
       document
