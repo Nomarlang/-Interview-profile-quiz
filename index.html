@@ -2612,6 +2612,83 @@
       cursor: wait;
     }
 
+    .pdf-export-visual {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      background: #fcfaff !important;
+      border: 1px solid #e7dff2;
+      border-radius: 14px;
+    }
+
+    .pdf-export-girl-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      background: #ffffff !important;
+      border-radius: 12px;
+    }
+
+    .pdf-export-girl {
+      display: block;
+      width: 100%;
+      max-width: 165px;
+      max-height: 190px;
+      object-fit: contain;
+    }
+
+    .pdf-export-pyramid-wrap {
+      min-width: 0;
+    }
+
+    .pdf-export-pyramid-wrap .pyramid {
+      margin: 0;
+      padding-top: 24px;
+      gap: 4px;
+    }
+
+    .pdf-export-pyramid-wrap .pyramid::before {
+      border-left-width: 10px;
+      border-right-width: 10px;
+      border-bottom-width: 14px;
+    }
+
+    .pdf-export-pyramid-wrap .pyramid-layer {
+      min-height: 39px;
+      border-radius: 10px;
+      grid-template-columns: 29% 71%;
+      outline: none !important;
+      transform: none !important;
+      box-shadow: none !important;
+      opacity: 1 !important;
+      filter: none !important;
+    }
+
+    .pdf-export-pyramid-wrap .pyramid-layer::after {
+      left: 29%;
+    }
+
+    .pdf-export-pyramid-wrap .layer-icon-zone svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .pdf-export-pyramid-wrap .layer-copy-zone {
+      padding: 4px 8px;
+    }
+
+    .pdf-export-pyramid-wrap .layer-level {
+      font-size: 6px;
+    }
+
+    .pdf-export-pyramid-wrap .layer-title {
+      font-size: 8px;
+    }
+
   </style>
 
   <script
@@ -4346,6 +4423,21 @@
         <section class="pdf-export-page">
           ${pageHeader(1)}
           ${studentMetaHTML}
+
+          <div class="pdf-export-visual">
+            <div class="pdf-export-girl-wrap">
+              <img
+                class="pdf-export-girl"
+                src="assets/girl-stage-6.png"
+                alt="Completed student interview profile"
+              >
+            </div>
+
+            <div class="pdf-export-pyramid-wrap">
+              ${buildPyramidHTML(true)}
+            </div>
+          </div>
+
           <div class="pdf-export-goal">
             <span>My future job</span>
             <strong>${formatAnswer(answers[0][1])}</strong>
@@ -4407,7 +4499,23 @@
       const exportRoot = buildPDFPages();
 
       try {
-        // Let the browser finish layout before capturing.
+        // Wait for local images and layout before capturing.
+        const exportImages =
+          Array.from(exportRoot.querySelectorAll("img"));
+
+        await Promise.all(
+          exportImages.map(image => {
+            if (image.complete) {
+              return Promise.resolve();
+            }
+
+            return new Promise(resolve => {
+              image.addEventListener("load", resolve, { once: true });
+              image.addEventListener("error", resolve, { once: true });
+            });
+          })
+        );
+
         await new Promise(resolve =>
           requestAnimationFrame(() =>
             requestAnimationFrame(resolve)
